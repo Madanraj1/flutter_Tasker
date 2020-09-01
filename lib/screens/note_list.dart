@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-import '../DB/database_helper.dart';
-import '../note.dart';
-import 'note_details.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:tasker/DB/database_helper.dart';
+import 'package:tasker/note.dart';
+import 'package:tasker/screens/note_details.dart';
 
 class NoteList extends StatefulWidget {
   @override
@@ -11,7 +10,7 @@ class NoteList extends StatefulWidget {
 }
 
 class _NoteListState extends State<NoteList> {
-  DataBaseHelper databaseHelper = DataBaseHelper();
+  DatabaseHelper databaseHelper = DatabaseHelper();
   List<Note> noteList;
   int count = 0;
 
@@ -24,15 +23,28 @@ class _NoteListState extends State<NoteList> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tasker'),
-        backgroundColor: Colors.greenAccent,
+        title: Text(
+          "Tasker",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.grey[800],
       ),
       body: getNoteListView(),
       floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.yellowAccent,
-          child: Icon(Icons.add),
+          backgroundColor: Colors.black,
+          child: Icon(
+            Icons.add,
+            color: Colors.white,
+          ),
           onPressed: () {
-            navigateToDetail(Note("", "", 2, ""), 'Add Note');
+            navigateToDetail(
+                Note(
+                    priority: 2,
+                    title: "",
+                    description: "",
+                    date: "",
+                    name: ""),
+                'Add Note');
           }),
     );
   }
@@ -45,15 +57,14 @@ class _NoteListState extends State<NoteList> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(10.0),
             ),
-            color: Colors.deepOrange,
-            elevation: 5.0,
+            elevation: 4.0,
+            color: Colors.blue[300],
             child: ListTile(
               leading: CircleAvatar(
                 backgroundImage:
                     NetworkImage("https://learncodeonline.in/mascot.png"),
               ),
               title: Text(
-                // this.noteList[index].title,
                 this.noteList[index].title,
                 style: TextStyle(
                     color: Colors.white,
@@ -62,9 +73,7 @@ class _NoteListState extends State<NoteList> {
               ),
               subtitle: Text(
                 this.noteList[index].date,
-                style: TextStyle(
-                  color: Colors.white,
-                ),
+                style: TextStyle(color: Colors.white),
               ),
               trailing: GestureDetector(
                 child: Icon(
@@ -72,7 +81,7 @@ class _NoteListState extends State<NoteList> {
                   color: Colors.white,
                 ),
                 onTap: () {
-                  navigateToDetail(this.noteList[index], "EditTodo");
+                  navigateToDetail(this.noteList[index], 'Edit Todo');
                 },
               ),
             ),
@@ -83,7 +92,10 @@ class _NoteListState extends State<NoteList> {
   void navigateToDetail(Note note, String title) async {
     bool result =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetail(note, title);
+      return NoteDetail(
+        note: note,
+        appBarTitle: title,
+      );
     }));
 
     if (result == true) {
@@ -92,7 +104,7 @@ class _NoteListState extends State<NoteList> {
   }
 
   void updateListView() {
-    final Future<Database> dbFuture = databaseHelper.initializeDatabase();
+    final Future<Database> dbFuture = databaseHelper.initalizeDatabase();
     dbFuture.then((database) {
       Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
       noteListFuture.then((noteList) {

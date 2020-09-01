@@ -1,60 +1,71 @@
 class Note {
-  int _id, _priority;
-  String _description, _date, _title;
+  int id, priority;
+  String title, description, date, name;
 
-  Note(this._description, this._date, this._priority, this._title);
+  Note({this.priority, this.title, this.description, this.date, this.name});
   Note.withId(
-      this._id, this._description, this._date, this._priority, this._title);
+      {this.id,
+      this.priority,
+      this.title,
+      this.description,
+      this.date,
+      this.name});
 
 // all the getters
-  int get id => _id;
-  int get priority => _priority;
-  String get description => _description;
-  String get date => _date;
-  String get title => _title;
+  int get getId => id;
+  int get getPriority => priority;
+  String get getTitle => title;
+  String get getdescription => description;
+  String get getDate => date;
+  String get getName => name;
 
-// all the setters
-  set title(String newTitle) {
-    if (newTitle.length <= 255) {
-      this._title = newTitle;
+  // all the setters
+
+  set setpriority(int newPriority) {
+    if (newPriority >= 1 && newPriority <= 2) {
+      this.priority = newPriority;
     }
   }
 
-  set description(String newdescription) {
-    if (newdescription.length <= 255) {
-      this._description = newdescription;
+  set setTitle(String newTitle) {
+    if (newTitle.length <= 50) {
+      this.title = newTitle;
     }
   }
 
-  set date(String newDate) {
-    this._date = newDate;
-  }
-
-  set priority(int newpriority) {
-    if (newpriority >= 1 && newpriority <= 2) {
-      this._priority = newpriority;
+  set setDescription(String newDescription) {
+    if (newDescription.length <= 255) {
+      this.description = newDescription;
     }
   }
 
-// used to save and retrive from DB
+  set setDate(String newDate) {
+    this.date = newDate;
+  }
 
-// convert note obj to map obj
-  Map<String, dynamic> toMap() {
+  set setName(String newName) {
+    if (newName.length <= 100) {
+      this.name = newName;
+    }
+  }
+
+  Map<String, dynamic> convertToMap() {
     var map = Map<String, dynamic>();
-    if (id != null) {
-      map['id'] = _id;
+    if (getId != null) {
+      map['id'] = id;
     }
-    map['title'] = _title;
-    map['description'] = _description;
-    map['priority'] = _priority;
-    map['date'] = _date;
+    map['title'] = title;
+    map['description'] = description;
+    map['date'] = date;
+    map['name'] = name;
     return map;
   }
 
   Note.fromMapObject(Map<String, dynamic> map) {
-    this._id = map['id'];
-    this._description = map['description'];
-    this._priority = map['priority'];
-    this._date = map['date'];
+    this.id = map['id'];
+    this.title = map['title'];
+    this.description = map['description'];
+    this.priority = map['priority'];
+    this.date = map['date'];
   }
 }

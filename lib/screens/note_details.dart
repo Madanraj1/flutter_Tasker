@@ -1,224 +1,227 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../note.dart';
-import '../DB/database_helper.dart';
 import 'package:intl/intl.dart';
+import 'package:tasker/DB/database_helper.dart';
+import 'package:tasker/note.dart';
 
 class NoteDetail extends StatefulWidget {
-  final String appBarTitle;
-  final Note note;
-  NoteDetail(
-    this.note,
-    this.appBarTitle,
-  );
-
+  String appBarTitle;
+  Note note;
+  NoteDetail({this.note, this.appBarTitle});
   @override
-  State<StatefulWidget> createState() {
-    return _NoteDetailState(this.note, this.appBarTitle);
-  }
+  _NoteDetailState createState() =>
+      _NoteDetailState(this.appBarTitle, this.note);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
   static var _priority = ['High', 'Low'];
-  DataBaseHelper helper = DataBaseHelper();
+  DatabaseHelper helper = DatabaseHelper();
   String appBarTitle;
   Note note;
-
-  _NoteDetailState(this.note, this.appBarTitle);
+  _NoteDetailState(this.appBarTitle, this.note);
   TextEditingController titleController = TextEditingController();
-  TextEditingController dscriptionController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     TextStyle textStyle = Theme.of(context).textTheme.title;
-
     titleController.text = note.title;
-    dscriptionController.text = note.description;
+    descriptionController.text = note.description;
 
     return WillPopScope(
-      child: Scaffold(
-        backgroundColor: Colors.cyan,
-        appBar: AppBar(
-          title: Text(appBarTitle),
-          backgroundColor: Colors.pink,
-          leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () {
-                moveToLastScreen();
-              }),
-        ),
-        body: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-            child: ListView(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
-                  //dropdown menu
-                  child: new ListTile(
-                    leading: const Icon(Icons.low_priority),
-                    title: DropdownButton(
-                        items: _priority.map((String dropDownStringItem) {
-                          return DropdownMenuItem<String>(
-                            value: dropDownStringItem,
-                            child: Text(dropDownStringItem,
-                                style: TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red)),
-                          );
-                        }).toList(),
-                        value: getPriorityAsString(note.priority),
-                        onChanged: (valueSelectedByUser) {
-                          // setState(() {
-                          //   updatePriorityAsInt(valueSelectedByUser);
-                          // });
-                        }),
-                  ),
-                ),
-                // Second Element
-                Padding(
-                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0),
-                  child: TextField(
-                    controller: titleController,
-                    style: textStyle,
-                    onChanged: (value) {
-                      updateTitle();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Title',
-                      labelStyle: textStyle,
-                      icon: Icon(Icons.title),
+        onWillPop: () {
+          moveToLastScreen();
+        },
+        child: Scaffold(
+          backgroundColor: Colors.amber,
+          appBar: AppBar(
+            title: Text(appBarTitle),
+            backgroundColor: Colors.pink,
+            leading: IconButton(
+                icon: Icon(Icons.arrow_back),
+                onPressed: () {
+                  moveToLastScreen();
+                }),
+          ),
+          body: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+              child: ListView(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.only(top: 15.0, bottom: 5.0),
+                    //dropdown menu
+                    child: new ListTile(
+                      leading: const Icon(Icons.low_priority),
+                      title: DropdownButton(
+                          items: _priority.map((String dropDownStringItem) {
+                            return DropdownMenuItem<String>(
+                              value: dropDownStringItem,
+                              child: Text(dropDownStringItem,
+                                  style: TextStyle(
+                                      fontSize: 20.0,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red)),
+                            );
+                          }).toList(),
+                          value: getPriorityAsString(note.priority),
+                          onChanged: (valueSelectedByUser) {
+                            setState(() {
+                              updatePriorityAsInt(valueSelectedByUser);
+                            });
+                          }),
                     ),
                   ),
-                ),
-
-                // Third Element
-                Padding(
-                  padding: EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0),
-                  child: TextField(
-                    controller: dscriptionController,
-                    style: textStyle,
-                    onChanged: (value) {
-                      updateDescription();
-                    },
-                    decoration: InputDecoration(
-                      labelText: 'Details',
-                      icon: Icon(Icons.details),
+                  // Second Element
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0),
+                    child: TextField(
+                      controller: titleController,
+                      style: textStyle,
+                      onChanged: (value) {
+                        updateTitle();
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Title',
+                        labelStyle: textStyle,
+                        icon: Icon(Icons.title),
+                      ),
                     ),
                   ),
-                ),
 
-                // Fourth Element
-                Padding(
-                  padding: EdgeInsets.all(15.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: RaisedButton(
-                          textColor: Colors.white,
-                          color: Colors.green,
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Save',
-                            textScaleFactor: 1.5,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              debugPrint("Save button clicked");
-                              _save();
-                            });
-                          },
-                        ),
+                  // Third Element
+                  Padding(
+                    padding:
+                        EdgeInsets.only(top: 15.0, bottom: 15.0, left: 15.0),
+                    child: TextField(
+                      controller: descriptionController,
+                      style: textStyle,
+                      onChanged: (value) {
+                        updateDescription();
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Details',
+                        icon: Icon(Icons.details),
                       ),
-                      Container(
-                        width: 5.0,
-                      ),
-                      Expanded(
-                        child: RaisedButton(
-                          textColor: Colors.white,
-                          color: Colors.red,
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(
-                            'Delete',
-                            textScaleFactor: 1.5,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _delete();
-                            });
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
+
+                  // Fourth Element
+                  Padding(
+                    padding: EdgeInsets.all(15.0),
+                    child: Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: RaisedButton(
+                            textColor: Colors.white,
+                            color: Colors.green,
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Save',
+                              textScaleFactor: 1.5,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                debugPrint("Save button clicked");
+                                _save();
+                              });
+                            },
+                          ),
+                        ),
+                        Container(
+                          width: 5.0,
+                        ),
+                        Expanded(
+                          child: RaisedButton(
+                            textColor: Colors.white,
+                            color: Colors.red,
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text(
+                              'Delete',
+                              textScaleFactor: 1.5,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _delete();
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-      onWillPop: () {
-        moveToLastScreen();
-      },
-    );
+        ));
   }
 
   void updateTitle() {
-    note.title = titleController.text;
+    note.setTitle = titleController.text;
   }
 
   void updateDescription() {
-    note.description = dscriptionController.text;
+    note.setDescription = descriptionController.text;
+  }
+
+  void updateName() {
+    note.setName = nameController.text;
+  }
+
+  void moveToLastScreen() {
+    Navigator.pop(context, true);
   }
 
   void _save() async {
     moveToLastScreen();
-    note.date = DateFormat.yMMMMd().format(DateTime.now());
+    note.setDate = DateFormat.yMMMd().format(DateTime.now());
     int result;
-    if (note.id != null) {
+    if (note.getId != null) {
       result = await helper.updateNote(note);
     } else {
       result = await helper.insertNote(note);
     }
 
     if (result != 0) {
-      _showAlertDialog("Status", "Note Saved Successfully");
+      showAlertDialog('Status', "Note Saved Successfully");
     } else {
-      _showAlertDialog("Status", "Problem Saving Note");
+      showAlertDialog("Status", "Problem Saving Note");
     }
   }
 
   void _delete() async {
     moveToLastScreen();
     if (note.id == null) {
-      _showAlertDialog("Status", "First Add a Note");
+      showAlertDialog("Statis", "Firs Add aNote");
       return;
     }
-
-    int result = await helper.deleteNote(note.id);
+    int result = await helper.deleteNote(note.getId);
     if (result != 0) {
-      _showAlertDialog("Status", "Note Deleted Successfully");
+      showAlertDialog('Status', "Note Deleted Successfully");
     } else {
-      _showAlertDialog("Status", "Error");
+      showAlertDialog("Status", "ERROR!!!!!!!!");
     }
   }
 
-  // convert to int to save into dataabse
+  // convert to int to save into database
   void updatePriorityAsInt(String value) {
     switch (value) {
       case 'High':
-        note.priority = 1;
+        note.setpriority = 1;
         break;
       case 'Low':
-        note.priority = 2;
+        note.setpriority = 2;
         break;
     }
   }
 
-// convert int to String to int to show user
+  // covert int to string to show user
   String getPriorityAsString(int value) {
     String priority;
     switch (value) {
@@ -228,15 +231,12 @@ class _NoteDetailState extends State<NoteDetail> {
       case 2:
         priority = _priority[1];
         break;
+      default:
     }
     return priority;
   }
 
-  void moveToLastScreen() {
-    Navigator.pop(context, true);
-  }
-
-  void _showAlertDialog(String title, String message) {
+  void showAlertDialog(String title, String message) {
     AlertDialog alertDialog = AlertDialog(
       title: Text(title),
       content: Text(message),
